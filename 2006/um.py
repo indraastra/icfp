@@ -1,7 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import psyco
 from psyco.classes import *
+import time
 import struct
 import sys
 import cProfile
@@ -14,6 +16,10 @@ N_REGISTERS = 8
 INT_MAX = 2**32
 # debug mode print statements
 DEBUG = True
+VM_DEBUG = False
+TIME_DEBUG = False
+# collects number of times each opcode was called
+OPCODE_COUNTS = [0]*14
 
 def bin2dec(bitstring):
     """
@@ -27,16 +33,33 @@ def dec2bin(num):
     """
     return ''.join([str((num >> i) & 1) for i in range(31,-1,-1)])
 
+def read_scroll(file):
+    infh = open(file, "rb")
+    integers = []
+    while True:
+        next = infh.read(4)
+        if next:
+            integer = struct.unpack(">L", next)[0]
+            integers.append(integer)
+        else:
+            break
+    return integers
+           
+
 class UniversalMachine:
     def __init__(self, scrollname=None):
         self.arrays = {}
         self.registers = [0] * N_REGISTERS
         self.finger = 0
         if scrollname:
+            if DEBUG:
+                print "Loading scroll %s!" % scrollname, 
             self.load_scroll(scrollname)
+            if DEBUG:
+                print "\rDone loading scroll %s!" % scrollname
 
     def load_scroll(self, scrollname):
-        operations = [bin2dec(x.strip()) for x in open(scrollname, "r").readlines()]
+        operations = read_scroll(scrollname)
         zero_array = self.arrays.setdefault(0, [])
         zero_array.extend(operations)
 
@@ -45,21 +68,28 @@ class UniversalMachine:
         while self.cycle():
             count += 1
             if count == max:
-                return
+                break
+
+        if TIME_DEBUG:
+            print OPCODE_COUNTS
 
     def cycle(self):
-        if DEBUG:
+        if VM_DEBUG:
             print ' '.join(map(str,self.registers))
+
         op = self.arrays[0][self.finger]
         self.finger += 1
         opnum = op >> 28
+
+        if TIME_DEBUG:
+            t1 = time.time()
 
         if 0 <= opnum <= 12:
             # regular operation
             A = (op & (0x00000007 << 6)) >> 6
             B = (op & (0x00000007 << 3)) >> 3
             C = op & 0x00000007
-            if DEBUG:
+            if VM_DEBUG:
                 print opnum, "; A:", A, "B:", B, "C:", C
             if opnum == 0:
                 if self.registers[C]:
@@ -99,9 +129,9 @@ class UniversalMachine:
             elif opnum == 10:
                 sys.stdout.write(chr(self.registers[C]))
             elif opnum == 11:
-                input = raw_input("> ")
-                if input:
-                    self.registers[C] = input
+                input = sys.stdin.read(1)
+                if input != "\n":
+                    self.registers[C] = ord(input)
                 else:
                     self.registers[C] = INT_MAX - 1
             elif opnum == 12:
@@ -109,20 +139,24 @@ class UniversalMachine:
                 if arrayid != 0:
                     self.arrays[0] = self.arrays[arrayid][:]
                 self.finger = self.registers[C]
-            return True
         else:
             # special operation
             A = (op & 0x0e000000) >> 25
             value = op & 0x01ffffff
-            if DEBUG:
+            if VM_DEBUG:
                 print opnum, "; A:", A, "value:", value
             if opnum == 13:
                 self.registers[A] = value
-            return True
+
+        if TIME_DEBUG:
+            total = time.time() - t1
+            OPCODE_COUNTS[opnum] += total
+
+        return True
 
 def main():
-    um = UniversalMachine(sys.argv[0])
-    um.spin(max=100000)
+    um = UniversalMachine(sys.argv[1])
+    um.spin()
 
 if __name__ == "__main__":
     main()
