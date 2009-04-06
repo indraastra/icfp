@@ -121,7 +121,7 @@ class UniversalMachine:
             return True
 
 def main():
-    um = UniversalMachine("sandmark.umz.bits")
+    um = UniversalMachine(sys.argv[0])
     um.spin(max=100000)
 
 if __name__ == "__main__":
