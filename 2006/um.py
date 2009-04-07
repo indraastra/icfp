@@ -15,7 +15,7 @@ N_REGISTERS = 8
 # maximum value for a 32 bit integer
 INT_MAX = 2**32
 # debug mode print statements
-DEBUG = True
+DEBUG = False
 VM_DEBUG = False
 TIME_DEBUG = False
 # collects number of times each opcode was called
@@ -74,12 +74,17 @@ class UniversalMachine:
             print OPCODE_COUNTS
 
     def cycle(self):
-        if VM_DEBUG:
-            print ' '.join(map(str,self.registers))
-
         op = self.arrays[0][self.finger]
         self.finger += 1
+
         opnum = op >> 28
+
+        if VM_DEBUG:
+            print "Read instruction:", op
+            print "Opcode:", opnum
+            print "Finger:", self.finger
+            print " ".join(map(str,self.registers))
+            print
 
         if TIME_DEBUG:
             t1 = time.time()
@@ -89,8 +94,6 @@ class UniversalMachine:
             A = (op & (0x00000007 << 6)) >> 6
             B = (op & (0x00000007 << 3)) >> 3
             C = op & 0x00000007
-            if VM_DEBUG:
-                print opnum, "; A:", A, "B:", B, "C:", C
             if opnum == 0:
                 if self.registers[C]:
                     self.registers[A] = self.registers[B]
@@ -143,8 +146,6 @@ class UniversalMachine:
             # special operation
             A = (op & 0x0e000000) >> 25
             value = op & 0x01ffffff
-            if VM_DEBUG:
-                print opnum, "; A:", A, "value:", value
             if opnum == 13:
                 self.registers[A] = value
 
