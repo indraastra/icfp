@@ -7,7 +7,6 @@
 #define PLATTER_ARRAY(id) (id ? (unsigned int *)id : ZERO)
 
 const int i = 1;
-#define is_bigendian() ( (*(char*)&i) == 0 )
 
 unsigned int* ZERO;
 unsigned int  FINGER = 0;
