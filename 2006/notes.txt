@@ -35,14 +35,9 @@
 
 * Passwords cracked:
     [PASS] ftd:falderal90
-           knr:
-           guest:[n/a]
-           gardener:
     [PASS] ohmega:bidirectional
-           yang:
     [PASS] howie:xyzzy
     [PASS] hmonk:COMEFROM
-           bbarker:
 
 
 [2009-04-08 00:44:57]
@@ -51,3 +46,101 @@
     [PUB] BASIC.MLC=100@999999|8f8f7b233a9deb154cbcd5314b8e930
 
 * Publication checker found! /home/ftd/icfp.exe
+
+[2009-04-08 10:04:45]
+
+* Adventure game:
+    | processor needs cache
+    | radio needs transistor and antenna
+    | A-1920-IXB needs transistor and processor and bolt and (radio missing antenna)
+    | motherboard needs screw and A-1920-IXB
+    | keypad needs motherboard and button
+
+    on unlocking door:
+    [PUB] ADVTR.KEY=20@999999|36995486a5be3bd747d778916846d2d
+
+[2009-04-08 17:18:53]
+
+* [SOL] Adventure game: to get out of the door at the beginning -
+    | n
+    | take bolt
+    | take spring
+    | take button
+    | take processor
+    | take pill
+    | take radio
+    | take cache
+    | incinerate pill
+    | take cache
+    | combine cache with processor
+    | take blue transistor
+    | combine transistor with radio
+    | take antenna
+    | incinerate antenna
+    | take screw
+    | take motherboard
+    | incinerate spring
+    | take motherboard
+    | combine motherboard with screw
+    | take A-1920-IXB
+    | combine A-1920-IXB with bolt
+    | combine A-1920-IXB with radio
+    | combine A-1920-IXB with processor
+    | take red transistor
+    | combine A-1920-IXB with transistor
+    | take keypad
+    | combine keypad and button
+    | combine motherboard and A-1920-IXB
+    | combine keypad with motherboard
+    | s
+    | use keypad
+
+* Adventure game:
+    | downloader needs USB cable, display, jumper shunt, progress bar, power cord
+    | uploader needs MOSFET, status LED, RS232 adapter, EPROM burner, battery
+    | USB cable needs (a T-9887-OFC missing a X-6458-TIJ), F-6678-DOX, N-4832-NUN
+
+    on creating USB cable:
+    ADVTR.USB=20@999999|5d764ff644ba600741a6ea9273b86f3
+
+* Passwords cracked:
+    [PASS] yang:U+262F
+
+
+[2009-04-09 19:18:33]
+
+* Certification puzzle:
+    | Puzzle: stop
+    | Initial memory: M[0-5] = [0, 1, 0, 0, 0, 0]
+    |  Remainder of memory initialized from /etc/passwd
+    | Initial registers: {0, 1, 2, 3} {4, 5}
+    | Final memory: Any
+    | Final registers: Any
+    | Certification point value: 5 - 10
+    
+    - need to make M[sR[0]] != 0
+    01111111 = 7F : add 11111 to sR[0] and rotate all by 1
+    00000000 = 00 : halt, since sR[0] = 1 and M[1] = 1
+    
+    [SOL] stop:7F00
+    [PUB] BLNCE.STP=10@999999|e1c3e7108c2a7697cc11151dc5649eb
+
+    | Puzzle: stop1
+    | Initial memory: M[0-5] = [0, 1, 0, 0, 0, 0].
+    |  Remainder of memory initialized from /etc/passwd
+    | Initial registers: {0, 0, 0, 0} {0, 0}
+    | Final memory: Any
+    | Final registers: Any
+    | Certification point value: 5 - 10
+
+    - need to make M[sR[0]] != 0
+    01100001 = 61 : add 00001 to sR[0] and swap with dR[1]
+    01100001 = 61 : add 00001 to sR[0] and swap with dR[1]
+    00000000 = 00 : halt, since sR[0] = 1 and M[1] = 1
+    
+    [SOL] stop1:616100
+    [PUB] BLNCE.ST1=5@999999|bb606534654eb4acf7663f72acac3ad
+
+
+* /etc/passwd in memory for puzzle stop:
+    [PASS] gardener:mathemantica

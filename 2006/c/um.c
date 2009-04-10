@@ -50,7 +50,7 @@ void print_registers() {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        printf("Please provide a scroll to read!\n");
+        printf("Please provide a scroll to read!\n$ ./um [scroll]\n");
         exit(-1);
     }
 
@@ -68,6 +68,8 @@ int main(int argc, char* argv[]) {
 
     ZERO = allocate_array(file_size/4);
     fread(ZERO, 4, file_size/4, scroll);
+    
+    // reverse endian-ness of the initial program
     int j;
     for (j = 0; j < file_size/4; j++) {
         ZERO[j] = reverseInt(ZERO[j]);
