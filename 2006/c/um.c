@@ -6,11 +6,11 @@
 #define NREGISTERS 8
 #define PLATTER_ARRAY(id) (id ? (unsigned int *)id : ZERO)
 
-const int i = 1;
+static const int i = 1;
 
-unsigned int* ZERO;
-unsigned int  FINGER = 0;
-unsigned int  REGISTERS[NREGISTERS];
+static unsigned int* ZERO;
+static unsigned int  FINGER = 0;
+static unsigned int  REGISTERS[NREGISTERS];
 
 
 unsigned int* allocate_array(unsigned int size) {
@@ -57,19 +57,20 @@ int main(int argc, char* argv[]) {
     FILE* scroll = fopen(argv[1], "rb");
 
     if (scroll == NULL) {
-        printf("Please provide a valid scroll name!\n");
+        printf("Please provide a valid scroll name!: %s\n", argv[1]);
         exit(-1);
     }
 
-    int file_size;
     struct stat st;
     fstat(fileno(scroll), &st);
-    file_size = st.st_size;
-
+    int file_size = st.st_size;
     ZERO = allocate_array(file_size/4);
-    fread(ZERO, 4, file_size/4, scroll);
-    
-    // reverse endian-ness of the initial program
+    int bytes_read = fread(ZERO, 4, file_size/4, scroll);
+    if (bytes_read != file_size/4) {
+    	exit(-1);
+    }
+
+    // reverse the endian-ness of the initial program
     int j;
     for (j = 0; j < file_size/4; j++) {
         ZERO[j] = reverseInt(ZERO[j]);
@@ -80,7 +81,6 @@ int main(int argc, char* argv[]) {
         unsigned int opcode = op >> 28;
 
         FINGER++;
-
         //printf("Read instruction: %u\n", op);
         //printf("Opcode: %u\n", opcode);
         //printf("Finger: %u\n", FINGER);
@@ -92,31 +92,44 @@ int main(int argc, char* argv[]) {
             unsigned int B = (op & (0x00000007 << 3)) >> 3;
             unsigned int C =  op &  0x00000007;
             switch (opcode) {
+				// conditional move
                 case 0 : if (REGISTERS[C]) REGISTERS[A] = REGISTERS[B];
                          break;
+                // array index
                 case 1 : REGISTERS[A] = PLATTER_ARRAY(REGISTERS[B])[REGISTERS[C]];
                          break;
+				// array amendment
                 case 2 : PLATTER_ARRAY(REGISTERS[A])[REGISTERS[B]] = REGISTERS[C];
                          break;
+				// addition
                 case 3 : REGISTERS[A] =  (REGISTERS[B] + REGISTERS[C]);
                          break;
+                // multiplication
                 case 4 : REGISTERS[A] =  (REGISTERS[B] * REGISTERS[C]);
                          break;
+                // division
                 case 5 : REGISTERS[A] =  (REGISTERS[B] / REGISTERS[C]);
                          break;
+                // NAND
                 case 6 : REGISTERS[A] = ~(REGISTERS[B] & REGISTERS[C]);
                          break;
+                // halt
                 case 7 : exit(0);
                          break;
+                // allocation
                 case 8 : REGISTERS[B] = (unsigned int)allocate_array(REGISTERS[C]);
                          break;
+                // abandonment
                 case 9 : free_array(PLATTER_ARRAY(REGISTERS[C]));
                          break;
+				// output
                 case 10: putchar(REGISTERS[C]);
                          break;
+                // input
                 case 11: REGISTERS[C] = getchar();
                          break;
-                case 12: { 
+                // load program
+                case 12: {
                              //printf("Allocating elements to copy from platter %u!\n", REGISTERS[B]);
                              if (REGISTERS[B] != 0) {
                                  unsigned int size = array_size(PLATTER_ARRAY(REGISTERS[B]));
@@ -125,12 +138,13 @@ int main(int argc, char* argv[]) {
                                  //printf("Allocated!\n");
                              }
                              FINGER = REGISTERS[C];
-                             break; 
+                             break;
                          }
             }
         } else {
             unsigned int A     = (op & 0x0e000000) >> 25;
             unsigned int value =  op & 0x01ffffff;
+            // orthography
             if (opcode == 13) {
                 REGISTERS[A] = value;
             } else {
@@ -140,6 +154,6 @@ int main(int argc, char* argv[]) {
         }
         //printf("\n");
     }
-    close(scroll);
+    fclose(scroll);
     return 0;
 }
