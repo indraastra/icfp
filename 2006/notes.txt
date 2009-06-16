@@ -45,7 +45,7 @@
 * /home/ftd/ml19100.exe gives:
     [PUB] BASIC.MLC=100@999999|8f8f7b233a9deb154cbcd5314b8e930
 
-* Publication checker found! /home/ftd/icfp.exe
+* [!!!] Publication checker found! /home/ftd/icfp.exe
 
 [2009-04-08 10:04:45]
 
@@ -117,13 +117,13 @@
     | Final memory: Any
     | Final registers: Any
     | Certification point value: 5 - 10
-    
     - need to make M[sR[0]] != 0
+
     01111111 = 7F : add 11111 to sR[0] and rotate all by 1
     00000000 = 00 : halt, since sR[0] = 1 and M[1] = 1
-    
     [SOL] stop:7F00
     [PUB] BLNCE.STP=10@999999|e1c3e7108c2a7697cc11151dc5649eb
+
 
     | Puzzle: stop1
     | Initial memory: M[0-5] = [0, 1, 0, 0, 0, 0].
@@ -137,10 +137,38 @@
     01100001 = 61 : add 00001 to sR[0] and swap with dR[1]
     01100001 = 61 : add 00001 to sR[0] and swap with dR[1]
     00000000 = 00 : halt, since sR[0] = 1 and M[1] = 1
-    
     [SOL] stop1:616100
     [PUB] BLNCE.ST1=5@999999|bb606534654eb4acf7663f72acac3ad
 
 
 * /etc/passwd in memory for puzzle stop:
     [PASS] gardener:mathemantica
+
+
+[2009-04-14 03:00:53]
+
+* Certification puzzle:
+    | Puzzle: stop1
+    - improved solution relies on looping nature of IP:
+    [SOL] stop1:6100
+    [PUB] BLNCE.ST1=10@999999|3417ffced484d8ab26e1062e7cd8feb
+
+
+[2009-04-15 02:24:49]
+
+* Certification puzzle:
+    | Puzzle: stop117
+    - add 1 until sR[0] == 127; then use science to halt
+    [SOL] stop127:6100
+    [PUB] BLNCE.S27=20@999999|a7f8d6a06903f3a8956d0f958a50a33
+
+* Missing adventure publication, found in transcript:
+    [PUB] ADVTR.USB=20@999999|5d764ff644ba600741a6ea9273b86f3
+
+* On finishing mult.2d:
+    [PUB] CIRCS.MUL=30@999999|fe8a47581d2a95699b216c13fb250bd
+    [PASS] bbarker:plinko
+
+* On finishing plinko model 000:
+    [PUB] BLACK.000=10@999999|4566683b0cde7717794ff5fc1c298c8
+

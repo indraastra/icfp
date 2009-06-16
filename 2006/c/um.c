@@ -1,3 +1,11 @@
+/*
+ * A UM Implementation in C
+ *
+ * (much credit for C tricks and tactics used given to ICFP 2006 official
+ * solution code)
+ *
+ */
+
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,22 +20,25 @@ static unsigned int* ZERO;
 static unsigned int  FINGER = 0;
 static unsigned int  REGISTERS[NREGISTERS];
 
-
+// allocates a UM array, with an extra element for the size
 unsigned int* allocate_array(unsigned int size) {
-    //printf("Allocating array for %u+1 elements\n", size);
+    // calloc zeroes out memory
     unsigned int* array = (unsigned int*) calloc(size + 1, 4);
     array[0] = size;
     return array + 1;
 }
 
+// frees a UM array
 void free_array(unsigned int* array) {
     free(array - 1);
 }
 
+// returns the size of a UM array (the first element is the size)
 unsigned int array_size(unsigned int* array) {
     return (unsigned int)(*(array - 1));
 }
 
+// reverses the endianness of an integer
 unsigned int reverseInt(unsigned int i) {
     unsigned char c1, c2, c3, c4;
     c1 = i & 255;
@@ -37,6 +48,7 @@ unsigned int reverseInt(unsigned int i) {
     return (c1 << 24) + (c2 << 16) + (c3 << 8) + c4;
 }
 
+// dumps the register content to stdout
 void print_registers() {
     int j;
     for (j = 0; j < NREGISTERS; j++) {
