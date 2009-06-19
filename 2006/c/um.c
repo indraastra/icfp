@@ -39,6 +39,7 @@ unsigned int array_size(unsigned int* array) {
 }
 
 // reverses the endianness of an integer
+// from http://www.ibm.com/developerworks/aix/library/au-endianc/index.html?ca=drs-
 unsigned int reverseInt(unsigned int i) {
     unsigned char c1, c2, c3, c4;
     c1 = i & 255;
